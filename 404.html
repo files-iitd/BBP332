@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <script>
+        // List of all invalid URL variations
+        const invalidUrls = [
+            "/infinity/biotech",
+            "/infinity/biotech-courses.html",
+            "/infinity/biotech-courses.htm",
+            "/infinity/biotech-courses.ht",
+            "/infinity/biotech-courses.h",
+            "/infinity/biotech-courses.",
+            "/infinity/biotech-course",
+            "/infinity/bio",
+            "/infinity/biotech_courses",
+            "/infinity/biotech-cours",
+            "/infinity/biotech-cour",
+            "/infinity/biotech-cou",
+            "/infinity/biotech-co",
+            "/infinity/biotech-c",
+            "/infinity/biotech-",
+            "/infinity/biotec",
+            "/infinity/biote",
+            "/infinity/biotechnlogy",
+            "/infinity/biot",
+            "/infinity/bi",
+            "/infinity/b"
+            
+        ];
+
+        // Get the current URL path
+        const currentUrl = window.location.pathname;
+
+        // Check if the current URL is in the invalid URL list
+        if (invalidUrls.includes(currentUrl)) {
+            // Redirect to the biotech courses page if it's in the invalid URL list
+            window.location.href = "https://rtnesharma.in/infinity/biotech-courses";
+        } else {
+            // Redirect to the quasars page for all other URLs
+            window.location.href = "https://files-iitd.github.io/";
+        }
+    </script>
+</head>
+<body>
+    <p>Redirecting... If you are not redirected automatically, click <a href="https://rtnesharma.in/infinity/quasars/">here</a>.</p>
+</body>
+</html>

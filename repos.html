@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BBL231P Course Files | IIT Delhi</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #e6eaf4 100%);
+        }
+        .file-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 12px;
+        }
+        .file-list-item {
+            transition: all 0.3s ease;
+        }
+        .file-list-item:hover {
+            transform: translateX(10px);
+            color: #3182ce;
+        }
+        .loader {
+            border-top-color: #3182ce;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="file-container w-full space-y-8">
+        <div class="text-center">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">BBL231P Course Repository</h1>
+            <p class="text-xl text-gray-600 mb-8">File List for IIT Delhi Students</p>
+        </div>
+        
+        <div id="loader" class="flex justify-center items-center mb-6">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+        </div>
+
+        <ul id="file-list" class="space-y-3 text-lg"></ul>
+    </div>
+
+    <script>
+        const repoOwner = 'files-iitd';
+        const repoName = 'BBL231P';
+        const branch = 'main';
+        const baseCustomURL = 'https://files.rtnesharma.in/BBL231P/';
+
+        async function fetchFilesFromGitHub(path = '', parentList = null) {
+            const apiURL = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}?ref=${branch}`;
+            try {
+                const response = await fetch(apiURL);
+                if (!response.ok) throw new Error(`Failed to fetch contents for ${path}`);
+                const items = await response.json();
+                
+                // Use the main list or create a nested list
+                const fileListElement = parentList || document.getElementById('file-list');
+                
+                // Sort items: directories first, then files alphabetically
+                const sortedItems = items.sort((a, b) => {
+                    if (a.type === 'dir' && b.type === 'file') return -1;
+                    if (a.type === 'file' && b.type === 'dir') return 1;
+                    return a.path.localeCompare(b.path);
+                });
+
+                for (const item of sortedItems) {
+                    if (item.type === 'file') {
+                        // Create list item for files
+                        const listItem = document.createElement('li');
+                        listItem.className = 'file-list-item bg-gray-100 p-3 rounded-lg hover:bg-blue-100 cursor-pointer';
+                        
+                        const link = document.createElement('a');
+                        link.href = `${baseCustomURL}${item.path}`;
+                        link.target = '_blank';
+                        link.className = 'flex items-center';
+                        
+                        // File icon and path
+                        const fileIcon = document.createElement('span');
+                        fileIcon.className = 'mr-3 text-blue-500';
+                        fileIcon.innerHTML = '📄'; // File emoji
+                        
+                        const filePathSpan = document.createElement('span');
+                        filePathSpan.textContent = item.path;
+                        
+                        link.appendChild(fileIcon);
+                        link.appendChild(filePathSpan);
+                        listItem.appendChild(link);
+                        fileListElement.appendChild(listItem);
+                    } else if (item.type === 'dir') {
+                        // Create a nested list for subfolders
+                        const listItem = document.createElement('li');
+                        listItem.className = 'bg-gray-200 p-3 rounded-lg';
+                        
+                        const folderSpan = document.createElement('span');
+                        folderSpan.className = 'font-semibold text-gray-800 flex items-center';
+                        folderSpan.innerHTML = '📁 ' + item.name;
+                        listItem.appendChild(folderSpan);
+                        
+                        const nestedList = document.createElement('ul');
+                        nestedList.className = 'pl-6 mt-2 space-y-2';
+                        listItem.appendChild(nestedList);
+                        
+                        fileListElement.appendChild(listItem);
+                        
+                        // Recursively fetch contents of the subfolder
+                        await fetchFilesFromGitHub(item.path, nestedList);
+                    }
+                }
+
+                // Hide loader once files are loaded
+                document.getElementById('loader').style.display = 'none';
+            } catch (error) {
+                console.error(`Error fetching files for path "${path}":`, error);
+                
+                // Show error message
+                const fileListElement = document.getElementById('file-list');
+                const errorItem = document.createElement('li');
+                errorItem.className = 'text-red-600 text-center p-4';
+                errorItem.textContent = `Error loading files: ${error.message}`;
+                fileListElement.appendChild(errorItem);
+                
+                // Hide loader
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+
+        // Start fetching files
+        fetchFilesFromGitHub();
+    </script>
+</body>
+</html>
